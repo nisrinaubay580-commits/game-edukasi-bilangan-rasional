@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="id"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rational Mart - Petualangan Kelompok</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;800&family=Work+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      var(--ink): #0f172a; 
+      var(--teal): #0f766e; 
+      var(--light-teal): #ccfbf1; 
+      var(--orange): #ea580c;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; width: 100%; font-family: 'Work Sans', sans-serif; color: #0f172a; -webkit-tap-highlight-color: transparent; }
+    h1, h2, h3 { font-family: 'Fraunces', serif; }
+    button, input { font-family: 'Work Sans', sans-serif; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; }
+    :is(button,input):focus-visible { outline: 3px solid #0f766e; outline-offset: 3px; }
+    
+    /* WATERMARK STYLING KANAN ATAS */
+    .watermark-top-right {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 9999;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 4px 14px;
+      border-radius: 9999px;
+      font-weight: 800;
+      font-size: 13px;
+      color: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: 0.5px;
+    }
+
+    /* BACKGROUND CUSTOM */
+    .app-wrap {
+      width: 100%; min-height: 100vh;
+      background: url('https://raw.githubusercontent.com/nisrinaubay580-commits/game/refs/heads/main/WhatsApp%20Image%202026-11-02%20at%2016.17.44.jpeg') center center / cover fixed no-repeat;
+      background-color: #dcf2e8;
+      position: relative; overflow-x: hidden;
+      padding-bottom: 2rem;
+    }
+    .content-relative { position: relative; z-index: 1; }
+
+    /* EFEK KACA SOLID */
+    .paper { 
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); 
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95) !important; 
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .panel-glass {
+      background: rgba(255, 255, 255, 0.92) !important; 
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+    }
+    
+    [hidden] { display: none !important; }
+    
+    /* PRODUK / RAK */
+    .product { transition: all .25s ease; position: relative; background: rgba(255, 255, 255, 0.95) !important; border: 2px solid rgba(226, 232, 240, 1); }
+    .product:hover:not(:disabled) { transform: translateY(-4px); background: #ffffff !important; box-shadow: 0 10px 20px rgba(15, 118, 110, 0.15); border-color: #0f766e; }
+    .product.selected { outline: 3px solid #0f766e; background: #ccfbf1 !important; transform: scale(0.97); border-color: transparent; }
+    
+    .category { transition: all .3s ease; color: #0f172a; border: 2px solid transparent; }
+    .category.active { outline: 3px solid #0f766e; background: #ccfbf1 !important; color: #064e3b !important; }
+    
+    /* LEVEL TERKUNCI */
+    .locked-nav { 
+      cursor: not-allowed !important; 
+      background: rgba(241, 245, 249, 0.98) !important; 
+      border: 2px dashed #94a3b8 !important; 
+      color: #334155 !important; 
+      box-shadow: none; 
+    }
+    .locked-nav span { opacity: 1 !important; }
+
+    /* PILIHAN JAWABAN MULTIPLE CHOICE */
+    .choice-btn {
+      transition: all 0.2s ease;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      color: #0f172a;
+    }
+    .choice-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: #0f766e;
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.15);
+    }
+    .choice-btn.selected-choice {
+      border-color: #0f766e;
+      background: #ccfbf1;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+    }
+    
+    /* ANIMASI */
+    .rise { animation: rise .6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+    .pop { animation: pop .4s ease-out both; }
+    .slide-in { animation: slideIn .4s ease-out both; }
+    .bounce-in { animation: bounceIn .5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+    
+    @keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pop { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes bounceIn { 0% { transform: scale(0.85); opacity: 0; } 50% { transform: scale(1.03); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    
+    @keyframes float { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-8px) rotate(4deg); } }
+    @keyframes pulseSoft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    
+    .anim-float { animation: float 3.5s ease-in-out infinite; display: inline-block; }
+    .anim-pulse { animation: pulseSoft 2.5s ease-in-out infinite; display: inline-block; }
+
+    /* EQUATION & FRACTION STYLING */
+    .math {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Fraunces', serif; gap: 0.2em;
+      background: #ffffff;
+      padding: 0.1em 0.4em; border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      color: #047857;
+      font-weight: 800;
+      border: 1px solid rgba(15, 118, 110, 0.3);
+    }
+    .math-frac {
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 0.85em; line-height: 1.1; margin: 0 0.1em;
+    }
+    .math-frac .num { border-bottom: 2px solid #047857; padding: 0 0.15em; width: 100%; text-align: center; }
+    .math-frac .den { padding: 0 0.15em; width: 100%; text-align: center; }
+    .math-whole { font-size: 1.15em; font-weight: 900; }
+
+    /* OPTIMASI TAMPILAN MOBILE */
+    @media (max-width: 640px) {
+      .app-wrap { padding: 10px; }
+      h1 { font-size: 32px !important; }
+      .responsive-container { padding: 1.2rem !important; }
+      .canva-panel { padding: 1.2rem !important; }
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+ </head>
+ <body data-template-id="__page-root" class="app-wrap">
+  
+  <!-- WATERMARK KANAN ATAS -->
+  <div class="watermark-top-right">nsrnanrby</div>
+
+  <!-- AUDIO LATAR BELAKANG -->
+  <audio id="bg-music" loop>
+    <source src="https://raw.githubusercontent.com/nisrinaubay580-commits/game/main/Pecahan_di_Keranjang.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="content-relative w-full max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+   <header class="flex items-center justify-between gap-2 mb-4 sm:mb-6">
+    <div class="flex items-center gap-2 sm:gap-3 rise">
+     <span aria-hidden="true" class="text-2xl sm:text-3xl rounded-2xl p-2 paper">🛒</span>
+     <span data-template-id="brand-name" class="canva-text font-extrabold tracking-tight text-base sm:text-xl bg-white/90 px-4 py-2 rounded-xl shadow-sm border border-white" style="color: #0f172a;">RATIONAL MART</span>
+    </div>
+    <div class="flex items-center gap-2 rise">
+      <span data-template-id="header-badge" class="canva-tag rounded-full px-4 py-2 font-bold hidden sm:inline-block shadow-sm text-sm border border-teal-100" style="background: rgba(255, 255, 255, 0.95); color: #0f766e;">Belajar Kelompok ✦</span>
+      <button id="sound-toggle" type="button" class="rounded-full w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center paper text-lg hover:scale-105 transition-transform" title="Matikan/Hidupkan Musik">🔇</button>
+    </div>
+   </header>
+
+   <main>
+    <!-- HALAMAN DEPAN -->
+    <section id="welcome" class="screen rise rounded-[1.8rem] sm:rounded-[2.5rem] overflow-hidden paper">
+     <div class="grid lg:grid-cols-2">
+      <div class="p-6 sm:p-12 lg:p-16 flex flex-col justify-center">
+       <span data-template-id="welcome-eyebrow" class="canva-tag self-start rounded-full px-4 py-1.5 mb-4 font-bold tracking-wide shadow-sm text-xs" style="background: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4;">PETUALANGAN MATEMATIKA KELAS VII</span>
+       <h1 data-template-id="welcome-title" class="canva-text leading-tight font-extrabold mb-3 text-3xl sm:text-5xl" style="color: #0f172a;">RATIONAL MART</h1>
+       <p data-template-id="welcome-description" class="canva-text leading-relaxed mb-6 text-sm sm:text-base font-semibold" style="color: #1e293b;">Jelajahi supermarket, isi keranjang, dan taklukkan tantangan bilangan rasional dengan kelompokmu!</p>
+       <form id="start-form" class="max-w-md space-y-3">
+        <label data-template-id="name-label" for="player-name" class="canva-text block font-extrabold text-sm sm:text-base" style="color: #0f172a;">Apa nama kelompok hebatmu hari ini?</label> 
+        <input data-template-id="name-input" id="player-name" class="canva-input w-full rounded-xl sm:rounded-2xl border-2 border-gray-300 p-3.5 sm:p-4 bg-white focus:border-teal-600 transition-all shadow-inner text-sm sm:text-base font-bold" maxlength="32" required="" autocomplete="off" placeholder="Ketik nama kelompok..." style="color: #0f172a;"> 
+        <button data-template-id="start-button" type="submit" class="canva-button w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-extrabold shadow-lg hover:shadow-xl transition-all text-sm sm:text-base" style="background: linear-gradient(135deg, #ff925c 0%, #ea580c 100%); color: white;">MULAI BERBELANJA →</button>
+       </form>
+      </div>
+      
+      <!-- GAMBAR KANAN -->
+      <div class="bg-gradient-to-br from-[rgba(255,255,255,0.6)] to-[rgba(255,255,255,0.2)] min-h-[300px] sm:min-h-[360px] flex items-center justify-center relative overflow-hidden p-6 border-l border-white/60">
+       <div class="relative w-full max-w-xs sm:max-w-sm pop">
+         <img src="https://raw.githubusercontent.com/nisrinaubay580-commits/game/refs/heads/main/WhatsApp%20Image%202026-11-02%20at%2016.39.22.jpeg" alt="Ilustrasi Belanja Rational Mart" class="w-full h-auto rounded-[2.5rem] border-[5px] border-[#0f172a] shadow-xl bg-white">
+       </div>
+      </div>
+     </div>
+    </section>
+
+    <!-- INSTRUKSI -->
+    <section id="instructions" class="screen" hidden="">
+     <div class="max-w-3xl mx-auto rounded-[2rem] sm:rounded-[2.5rem] paper p-4 sm:p-8 rise responsive-container text-center">
+      <div class="overflow-hidden rounded-2xl shadow-md border-[3px] border-[#0f172a] bg-white inline-block w-full max-w-2xl">
+        <img src="https://raw.githubusercontent.com/nisrinaubay580-commits/game/main/WhatsApp%20Image%202026-11-02%20at%2022.15.33.jpeg" alt="Cara Bermain Rational Mart" class="w-full h-auto block object-cover">
+      </div>
+      <div class="mt-6">
+        <button id="enter-game" data-template-id="enter-button" type="button" class="canva-button rounded-xl sm:rounded-2xl px-10 py-4 font-extrabold shadow-lg hover:shadow-xl transition-all text-sm sm:text-base" style="background: linear-gradient(135deg, #ff925c 0%, #ea580c 100%); color: white;">SIAP, KAMI BISA! →</button>
+      </div>
+     </div>
+    </section>
+
+    <!-- AREA GAME -->
+    <section id="game" class="screen" hidden="">
+     <!-- HEADER GAME -->
+     <div class="flex flex-wrap items-center justify-between gap-3 mb-4 rise">
+      <div class="px-4 py-2.5 rounded-2xl paper flex gap-3 items-center border border-white">
+       <span class="text-2xl anim-pulse">👥</span>
+       <div>
+         <p data-template-id="player-caption" class="canva-text font-extrabold text-xs" style="color: #0f766e;">Tim Kelompok</p>
+         <h2 id="player-display" class="font-extrabold text-lg sm:text-xl text-[#0f172a]"></h2>
+       </div>
+      </div>
+      <div class="flex gap-2">
+       <div class="rounded-xl sm:rounded-2xl px-4 py-2.5 paper flex flex-col items-center justify-center min-w-[75px] border border-white">
+        <span data-template-id="score-label" class="canva-text font-extrabold text-[10px] uppercase tracking-wider" style="color: #0f766e;">Skor</span> 
+        <div class="text-[#ea580c] font-black text-base sm:text-xl"><strong id="score-display">0</strong><span class="text-xs text-gray-500 font-bold">/90</span></div>
+       </div>
+       <div class="rounded-xl sm:rounded-2xl px-4 py-2.5 paper flex flex-col items-center justify-center min-w-[75px] border border-white">
+        <span data-template-id="level-label" class="canva-text font-extrabold text-[10px] uppercase tracking-wider" style="color: #0f766e;">Misi</span> 
+        <div class="text-[#0f766e] font-black text-base sm:text-xl"><strong id="level-display">1</strong><span class="text-xs text-gray-500 font-bold">/3</span></div>
+       </div>
+      </div>
+     </div>
+     
+     <!-- PROGRESS BAR -->
+     <div class="h-3 rounded-full bg-white/80 overflow-hidden mb-4 paper rise" role="progressbar" id="progress" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0">
+      <div id="progress-fill" class="h-full rounded-full bg-gradient-to-r from-[#ea580c] to-[#c2410c] transition-all duration-700 ease-out shadow-inner" style="width:0%"></div>
+     </div>
+     
+     <!-- TAB LEVEL -->
+     <nav aria-label="Pilih Level" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4 rise">
+         <button type="button" data-category="0" class="category canva-button text-left rounded-xl paper p-3 sm:p-4 font-bold relative overflow-hidden text-xs sm:text-sm" style="color: #0f172a;">
+             <span>Level 1: Pecahan</span> 
+             <span class="block text-[11px] font-semibold opacity-90 mt-0.5 text-gray-700">+ dan −</span>
+             <span class="lock-icon block mt-2 text-[10px] font-black bg-white text-[#0f766e] px-2 py-0.5 rounded w-fit uppercase border border-teal-200"></span>
+         </button> 
+         <button type="button" data-category="1" class="category canva-button text-left rounded-xl paper p-3 sm:p-4 font-bold relative overflow-hidden text-xs sm:text-sm" style="color: #0f172a;">
+             <span>Level 2: Desimal</span> 
+             <span class="block text-[11px] font-semibold opacity-90 mt-0.5 text-gray-700">+ dan −</span>
+             <span class="lock-icon block mt-2 text-[10px] font-black bg-white text-[#0f766e] px-2 py-0.5 rounded w-fit uppercase border border-teal-200"></span>
+         </button> 
+         <button type="button" data-category="2" class="category canva-button text-left rounded-xl paper p-3 sm:p-4 font-bold relative overflow-hidden text-xs sm:text-sm" style="color: #0f172a;">
+             <span>Level 3: Campuran</span> 
+             <span class="block text-[11px] font-semibold opacity-90 mt-0.5 text-gray-700">Desimal & Pecahan</span>
+             <span class="lock-icon block mt-2 text-[10px] font-black bg-white text-[#0f766e] px-2 py-0.5 rounded w-fit uppercase border border-teal-200"></span>
+         </button>
+     </nav>
+     
+     <div class="grid lg:grid-cols-[minmax(0,1fr)_330px] gap-4 sm:gap-6">
+      
+      <!-- AREA KIRI (RAK & SOAL) -->
+      <div class="space-y-4 sm:space-y-6 min-w-0">
+       
+       <!-- RAK -->
+       <section data-template-id="shelf-panel" class="canva-panel rounded-[1.8rem] sm:rounded-[2rem] paper panel-glass p-4 sm:p-6 rise">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3 sm:mb-4 border-b border-gray-300 pb-3">
+         <h2 data-template-id="shelf-title" class="canva-text font-extrabold text-lg sm:text-xl" style="color: #0f172a;">Pilih Barang 🛍️</h2>
+         <span data-template-id="shelf-note" class="canva-text font-black bg-[#fef3c7] text-[#92400e] px-2.5 py-0.5 rounded-full text-[11px] uppercase border border-yellow-300">Klik 2 barang</span>
+        </div>
+        <div id="shelf" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+       </section>
+       
+       <!-- PAPAN SOAL & PILIHAN GANDA -->
+       <section data-template-id="challenge-panel" class="canva-panel rounded-[1.8rem] sm:rounded-[2rem] paper panel-glass p-4 sm:p-6 rise">
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+         <span id="mission-number" class="bg-gradient-to-r from-[#fef08a] to-[#fde047] rounded-full px-3 py-1 font-black text-yellow-900 shadow-sm text-xs border border-yellow-400"></span>
+         <span id="mission-level" class="font-black text-teal-900 bg-teal-100 px-2.5 py-1 rounded-full text-xs uppercase border border-teal-300"></span>
+        </div>
+        <h3 id="question-title" class="font-extrabold text-xl text-[#0f172a] mb-1"></h3>
+        
+        <div id="question-text" class="mt-3 leading-relaxed text-sm sm:text-base bg-white p-4 rounded-xl border border-gray-200 shadow-sm font-semibold text-gray-800"></div>
+        
+        <!-- BAGIAN PILIHAN GANDA -->
+        <div id="answer-form" class="mt-4 bg-[#f8fafc] p-4 rounded-xl border border-gray-300 shadow-sm" hidden>
+         <label class="canva-text block font-extrabold mb-2.5 text-xs sm:text-sm" style="color: #0f172a;">Pilih jawaban persamaan kelompokmu:</label>
+         <div id="choices-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3"></div>
+         <button id="check-button" type="button" class="canva-button w-full rounded-xl px-6 py-3.5 font-extrabold text-white shadow-md hover:shadow-lg transition-all text-sm disabled:opacity-50" style="background: linear-gradient(135deg, #0f766e 0%, #042f2e 100%);" disabled>PERIKSA JAWABAN 🚀</button>
+        </div>
+        
+        <div class="flex flex-wrap gap-2.5 mt-4">
+         <button id="hint-button" data-template-id="hint-button" type="button" class="canva-button rounded-xl px-4 py-2 font-bold shadow-sm text-xs sm:text-sm border border-blue-300" style="background: #e0f2fe; color: #0369a1;">💡 Petunjuk Langkah</button> 
+         <button id="key-button" data-template-id="key-button" type="button" disabled="" class="canva-button rounded-xl px-4 py-2 font-bold shadow-sm text-xs sm:text-sm border border-orange-300" style="background: #ffedd5; color: #c2410c;">Lihat Kunci Jawaban</button>
+        </div>
+        
+        <div id="hint-display" class="mt-3 rounded-xl bg-[#fffbeb] border border-yellow-400 p-4 font-bold text-yellow-900 text-xs sm:text-sm slide-in shadow-sm" aria-live="polite" hidden=""></div>
+        
+        <!-- Umpan Balik Benar/Salah (Feedback) -->
+        <div id="feedback" class="mt-4 rounded-xl p-4 font-bold text-sm sm:text-base shadow-sm" role="status" aria-live="polite" hidden=""></div>
+        
+        <section id="key-panel" data-template-id="key-panel" class="canva-panel mt-4 rounded-xl p-4 sm:p-5 slide-in shadow-inner border border-teal-300" aria-label="Kunci jawaban" hidden="" style="background: #f0fdf4;">
+         <h3 data-template-id="key-title" class="canva-text font-extrabold mb-3 border-b border-teal-300 pb-2 text-teal-900 text-base">🔎 Pembahasan Lengkap</h3>
+         <div id="key-answer" class="font-black mb-3 text-sm sm:text-base bg-white p-2.5 rounded-lg inline-block shadow-sm border border-teal-100"></div>
+         <ol id="key-steps" class="list-decimal pl-5 space-y-3 font-semibold text-xs sm:text-sm text-gray-900"></ol>
+         <div id="key-why" class="mt-5 font-bold text-teal-900 bg-white p-3 rounded-lg shadow-sm text-xs sm:text-sm border border-teal-100"></div>
+        </section>
+        
+        <button id="next-button" data-template-id="next-button" type="button" class="canva-button mt-4 w-full rounded-xl px-6 py-3.5 font-extrabold shadow-md text-white text-sm sm:text-base" hidden="" style="background: linear-gradient(135deg, #0f766e 0%, #059669 100%);">LANJUT MISI BERIKUTNYA →</button>
+       </section>
+      </div>
+      
+      <!-- KERANJANG (SAMPING KANAN) -->
+      <aside data-template-id="cart-panel" class="canva-panel rounded-[1.8rem] sm:rounded-[2rem] paper panel-glass p-4 sm:p-6 h-fit lg:sticky lg:top-5 rise">
+       <div class="text-4xl sm:text-5xl mb-2 anim-pulse" aria-hidden="true">🛒</div>
+       <h2 data-template-id="cart-title" class="canva-text font-extrabold mb-1 text-xl sm:text-2xl" style="color: #0f172a;">Isi Keranjang</h2>
+       <p data-template-id="cart-description" class="canva-text mb-3 pb-3 border-b border-dashed border-gray-400 text-xs sm:text-sm font-semibold" style="color: #334155;">Klik ulang barang jika ingin menukar pilihan.</p>
+       
+       <ol id="cart-items" class="space-y-2.5 min-h-[4rem] text-xs sm:text-sm" aria-live="polite"></ol>
+       
+       <div id="cart-empty" data-template-id="cart-empty-text" class="canva-text py-4 text-center bg-gray-100/90 rounded-xl border border-dashed border-gray-400 text-xs sm:text-sm">
+         <span class="block text-xl mb-1">🤔</span>
+         <span class="font-bold text-gray-700">Belum ada barang dipilih.</span>
+       </div>
+       
+       <!-- DESAIN STATUS KERANJANG -->
+       <div class="bg-[#f0fdf4] rounded-xl p-3.5 mt-4 border border-green-300 shadow-sm">
+        <div class="flex justify-between items-center gap-2 font-extrabold text-green-900 text-xs sm:text-sm">
+         <span data-template-id="total-label" class="canva-text">Status Keranjang</span>
+         <span id="cart-status" class="font-black text-[#0f766e] bg-white border border-green-200 px-3 py-1.5 rounded-lg text-sm sm:text-base shadow-sm">0/2 Barang</span>
+        </div>
+       </div>
+      </aside>
+     </div>
+    </section>
+
+    <!-- HASIL AKHIR (SKOR & MAIN LAGI) -->
+    <section id="result" class="screen" hidden="">
+     <div class="max-w-xl mx-auto rounded-[2.5rem] paper panel-glass p-6 sm:p-12 text-center rise">
+      <div class="text-7xl sm:text-8xl mb-4 anim-float" aria-hidden="true">🏆</div>
+      <h2 data-template-id="result-title" class="canva-text font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-teal-800 to-emerald-700 text-2xl sm:text-4xl">LULUS SEMPURNA!</h2>
+      <p id="result-name" class="mt-2 font-black text-lg sm:text-2xl text-[#ea580c]"></p>
+      <p data-template-id="result-message" class="canva-text mt-3 text-xs sm:text-sm leading-relaxed font-bold" style="color: #334155;">Luar biasa! Kelompok kalian sudah menaklukkan seluruh tantangan bilangan rasional dengan sangat gemilang.</p>
+      
+      <!-- BAGIAN TAMPILAN SKOR -->
+      <div class="grid grid-cols-2 gap-3 sm:gap-4 mt-6 mb-6">
+       <div class="rounded-2xl sm:rounded-3xl bg-[#dcfce3] p-4 sm:p-5 shadow-sm border border-green-400">
+        <p data-template-id="final-score-label" class="canva-text font-extrabold mb-1 uppercase tracking-wide text-green-900 text-xs">Skor Total</p>
+        <strong id="final-score" class="text-3xl sm:text-4xl text-green-800 font-black"></strong>
+       </div>
+       <div class="rounded-2xl sm:rounded-3xl bg-[#fef08a] p-4 sm:p-5 shadow-sm border border-yellow-400">
+        <p data-template-id="correct-label" class="canva-text font-extrabold mb-1 uppercase tracking-wide text-yellow-900 text-xs">Jawaban Benar</p>
+        <strong id="correct-count" class="text-3xl sm:text-4xl text-yellow-800 font-black"></strong>
+       </div>
+      </div>
+      
+      <!-- TOMBOL MAIN LAGI -->
+      <button id="restart-button" data-template-id="restart-button" type="button" class="canva-button rounded-xl sm:rounded-2xl px-8 py-4 font-extrabold shadow-lg hover:shadow-xl transition-all text-sm sm:text-base text-white" style="background: linear-gradient(135deg, #ff925c 0%, #ea580c 100%);">MAIN LAGI ↻</button>
+     </div>
+    </section>
+   </main>
+   <footer class="text-center py-6">
+    <p data-template-id="footer-text" class="canva-text font-bold text-xs sm:text-sm bg-white/90 inline-block px-4 py-2 rounded-full shadow-sm border border-gray-200" style="color: #0f172a;">Rational Mart • Petualangan Matematika Kelas VII</p>
+   </footer>
+  </div>
+  
+  <script>
+    const $ = id => document.getElementById(id);
+    const groups = ['Level 1: Pecahan', 'Level 2: Desimal', 'Level 3: Campuran'];
+    
+    // SETUP AUDIO & SOUND EFFECT
+    const bgMusic = $('bg-music');
+    const soundToggle = $('sound-toggle');
+    let isMusicPlaying = false;
+    bgMusic.volume = 0.4; 
+
+    function toggleMusic() {
+       playClickSound();
+       if (isMusicPlaying) {
+          bgMusic.pause();
+          soundToggle.textContent = '🔇';
+       } else {
+          bgMusic.play().catch(e => console.log('Audio error:', e));
+          soundToggle.textContent = '🔊';
+       }
+       isMusicPlaying = !isMusicPlaying;
+    }
+    soundToggle.addEventListener('click', toggleMusic);
+
+    function playClickSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.08);
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+      } catch(e) {}
+    }
+
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('button')) {
+        playClickSound();
+      }
+    });
+
+    // PENGACAK DINAMIS AGAR SOAL SELALU BERBEDA SETIAP MAIN
+    let fractionItems = [];
+    let decimalItems = [];
+    let mixedItems = [];
+
+    function generateGameItems() {
+      const getFrac = () => {
+         const denoms = [2, 3, 4, 5, 6, 8, 10];
+         const d = denoms[Math.floor(Math.random() * denoms.length)];
+         const maxN = d * 2; 
+         let n = Math.floor(Math.random() * maxN) + 1;
+         if (n === d) n += 1;
+         return {n, d};
+      };
+      
+      const getDec = () => {
+         let n = (Math.floor(Math.random() * 30) + 1) * 25; 
+         return {n, d: 100};
+      };
+
+      fractionItems = [
+        {id:'gula', name:'Gula', icon:'🍬', form:'fraction', ...getFrac()},
+        {id:'tepung', name:'Tepung', icon:'🌾', form:'fraction', ...getFrac()},
+        {id:'beras', name:'Beras', icon:'🍚', form:'fraction', ...getFrac()},
+        {id:'kacang', name:'Kacang', icon:'🥜', form:'fraction', ...getFrac()}, 
+        {id:'kopi', name:'Kopi', icon:'☕', form:'fraction', ...getFrac()}, 
+        {id:'teh', name:'Teh', icon:'🍵', form:'fraction', ...getFrac()} 
+      ];
+
+      decimalItems = [
+        {id:'roti',name:'Roti',icon:'🥖',form:'decimal', ...getDec()},
+        {id:'susu',name:'Susu',icon:'🥛',form:'decimal', ...getDec()},
+        {id:'apel',name:'Apel',icon:'🍎',form:'decimal', ...getDec()},
+        {id:'wortel',name:'Wortel',icon:'🥕',form:'decimal', ...getDec()},
+        {id:'jus',name:'Jus',icon:'🧃',form:'decimal', ...getDec()},
+        {id:'buku',name:'Buku',icon:'📓',form:'decimal', ...getDec()}
+      ];
+
+      mixedItems = [
+        {id:'tepung',name:'Tepung',icon:'🌾',form:'fraction', ...getFrac()},
+        {id:'kopi', name:'Kopi', icon:'☕', form:'fraction', ...getFrac()},
+        {id:'beras',name:'Beras',icon:'🍚',form:'fraction', ...getFrac()},
+        {id:'apel',name:'Apel',icon:'🍎',form:'decimal', ...getDec()},
+        {id:'jeruk',name:'Jeruk',icon:'🍊',form:'decimal', ...getDec()},
+        {id:'wortel',name:'Wortel',icon:'🥕',form:'decimal', ...getDec()}
+      ];
+    }
+
+    generateGameItems();
+    
+    const state = {
+      index: 0, 
+      score: 0, 
+      correct: 0, 
+      player: '', 
+      records: Array.from({length:9},()=>({chosen:[], attempts:[], completed:false, correct:false, key:null, choices:null, selectedVal:null})), 
+      hint: 0
+    };
+    
+    const colors=['#fefce8','#f0f9ff','#fff5f5','#f0fdf4','#fef3c7','#f5f3ff'];
+    
+    const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+    const lcm=(a,b)=>a*b/gcd(a,b);
+    
+    const renderMath = (n, d, form) => {
+      if(form === 'decimal') {
+         return `<span class="math">${(n/d).toFixed(2).replace('.',',')}</span>`;
+      }
+      if(n === 0) return `<span class="math">0</span>`;
+      const g = gcd(n, d);
+      const num = n/g, den = d/g;
+      
+      const buildFrac = (nu, de) => `<span class="math-frac"><span class="num">${nu}</span><span class="den">${de}</span></span>`;
+      
+      if(Math.abs(num) >= den && den !== 1) {
+         const whole = Math.floor(Math.abs(num)/den)*Math.sign(num);
+         const rem = Math.abs(num)%den;
+         if(rem === 0) return `<span class="math"><span class="math-whole">${whole}</span></span>`;
+         return `<span class="math"><span class="math-whole">${whole}</span>${buildFrac(rem, den)}</span>`;
+      }
+      if(den === 1) return `<span class="math"><span class="math-whole">${num}</span></span>`;
+      return `<span class="math">${buildFrac(num, den)}</span>`;
+    };
+
+    const decimalText = n => n.toFixed(2).replace('.',',');
+    const value = p => p.n/p.d;
+    
+    const pool=()=>state.index<3?fractionItems:state.index<6?decimalItems:mixedItems;
+    const record=()=>state.records[state.index];
+    const unit=()=>state.index>=3&&state.index<6?'Rp':'kg';
+    
+    const display=p=> {
+      const numHtml = renderMath(p.n, p.d, p.form);
+      return state.index>=3 && state.index<6 ? `<span class="font-extrabold text-orange-700">Rp</span> ${numHtml}` : `${numHtml} <span class="text-xs font-bold text-gray-500">kg</span>`;
+    };
+    
+    const resultTextDecimal=n=>unit()==='Rp'?'Rp'+decimalText(n):decimalText(n)+' kg';
+    const operation=()=>state.index%2===0?'+':'−';
+    
+    const getExpectedFormat = () => {
+      if(state.index < 3) return 'pecahan';
+      if(state.index < 6) return 'desimal';
+      return state.index % 2 === 0 ? 'pecahan' : 'desimal';
+    };
+
+    function isLevelUnlocked(levelIndex) {
+      if(levelIndex === 0) return true; 
+      if(levelIndex === 1) return state.records.slice(0,3).every(r => r.completed); 
+      if(levelIndex === 2) return state.records.slice(3,6).every(r => r.completed); 
+      return false;
+    }
+
+    function screen(id){document.querySelectorAll('.screen').forEach(el=>el.hidden=el.id!==id)}
+    function selectedItems(){return record().chosen.map(id=>pool().find(p=>p.id===id)).filter(Boolean)}
+    
+    function problem(){
+      const [a,b]=selectedItems();
+      if(!a||!b)return null;
+      const denominator = lcm(a.d,b.d), an = a.n*(denominator/a.d), bn = b.n*(denominator/b.d);
+      const numerator = operation()==='+' ? an+bn : Math.abs(an-bn);
+      
+      const answer = numerator/denominator;
+      const steps = [];
+      const opSpan = `<span class="math px-1 shadow-none border-none bg-transparent">${operation()}</span>`;
+      const eqSpan = `<span class="math px-1 shadow-none border-none bg-transparent">=</span>`;
+      
+      let finalA = a;
+      let finalB = b;
+      let anDisplay = an;
+      let bnDisplay = bn;
+      
+      if (operation() === '−' && a.n/a.d < b.n/b.d) {
+          finalA = b;
+          finalB = a;
+          anDisplay = bn;
+          bnDisplay = an;
+      }
+
+      const mathA = renderMath(finalA.n, finalA.d, finalA.form);
+      const mathB = renderMath(finalB.n, finalB.d, finalB.form);
+      const finalMathFrac = renderMath(numerator, denominator, 'fraction');
+      const finalMathDec = renderMath(Math.round(answer*100), 100, 'decimal');
+
+      const renderRawFrac = (n, d) => `<span class="math"><span class="math-frac"><span class="num">${n}</span><span class="den">${d}</span></span></span>`;
+
+      if(state.index<3){
+        const mixedA = finalA.n > finalA.d && finalA.d !== 1;
+        const mixedB = finalB.n > finalB.d && finalB.d !== 1;
+        
+        if(mixedA || mixedB) {
+            let detailA = "";
+            if (mixedA) {
+                const wA = Math.floor(finalA.n / finalA.d);
+                const rA = finalA.n % finalA.d;
+                detailA = `<div class="flex items-center justify-center gap-2 w-full">${mathA} = ${renderRawFrac(`(${wA} &times; ${finalA.d}) + ${rA}`, finalA.d)} = ${renderRawFrac(finalA.n, finalA.d)}</div>`;
+            } else {
+                detailA = `<div class="flex items-center justify-center gap-2 w-full text-sm text-gray-600">${renderRawFrac(finalA.n, finalA.d)} &rarr; <span class="italic">Sudah pecahan biasa</span></div>`;
+            }
+
+            let detailB = "";
+            if (mixedB) {
+                const wB = Math.floor(finalB.n / finalB.d);
+                const rB = finalB.n % finalB.d;
+                detailB = `<div class="flex items-center justify-center gap-2 w-full">${mathB} = ${renderRawFrac(`(${wB} &times; ${finalB.d}) + ${rB}`, finalB.d)} = ${renderRawFrac(finalB.n, finalB.d)}</div>`;
+            } else {
+                detailB = `<div class="flex items-center justify-center gap-2 w-full text-sm text-gray-600">${renderRawFrac(finalB.n, finalB.d)} &rarr; <span class="italic">Sudah pecahan biasa</span></div>`;
+            }
+
+            steps.push(`<strong>Langkah 1: Ubah ke Pecahan Biasa</strong><br>` +
+                       `<div class="text-center w-full mt-1"><span class="text-teal-800 font-bold text-[11px] sm:text-xs bg-teal-50 py-1 px-2 rounded-lg border border-teal-200 shadow-sm inline-block">💡 Rumus: (Bilangan Bulat &times; Penyebut) + Pembilang</span></div>` +
+                       `<div class="mt-3 flex flex-col gap-3 w-full text-lg">` +
+                       detailA +
+                       detailB +
+                       `</div>`);
+        } else {
+            steps.push(`<strong>Langkah 1: Cek Pecahan Biasa</strong><br>` +
+                       `<div class="mt-2 text-center text-gray-700 text-sm">Kedua angka sudah berupa pecahan biasa: <br><div class="mt-2 flex items-center justify-center gap-3">${renderRawFrac(finalA.n, finalA.d)} dan ${renderRawFrac(finalB.n, finalB.d)}</div></div>`);
+        }
+
+        if (finalA.d !== finalB.d) {
+            const multA = denominator / finalA.d;
+            const multB = denominator / finalB.d;
+            steps.push(`<strong>Langkah 2: Samakan Penyebut (KPK = ${denominator})</strong>` +
+                       `<div class="mt-2 flex flex-col gap-2 items-center text-lg">` +
+                       `<div class="flex items-center gap-2">${renderRawFrac(finalA.n, finalA.d)} = ${renderRawFrac(finalA.n + '&times;' + multA, finalA.d + '&times;' + multA)} = ${renderRawFrac(anDisplay, denominator)}</div>` +
+                       `<div class="flex items-center gap-2">${renderRawFrac(finalB.n, finalB.d)} = ${renderRawFrac(finalB.n + '&times;' + multB, finalB.d + '&times;' + multB)} = ${renderRawFrac(bnDisplay, denominator)}</div>` +
+                       `</div>`);
+        } else {
+            steps.push(`<strong>Langkah 2: Samakan Penyebut</strong><br><div class="mt-2 text-center text-gray-700 text-sm">Penyebut sudah sama yaitu ${denominator}.</div>`);
+        }
+
+        const g = gcd(Math.abs(numerator), denominator);
+        const simpN = numerator / g;
+        const simpD = denominator / g;
+
+        let step3Html = `<strong>Langkah 3: Hitung & Sederhanakan</strong>` +
+                        `<div class="mt-3 flex items-center justify-center gap-3 flex-wrap text-lg">` +
+                        `${renderRawFrac(anDisplay, denominator)} ${opSpan} ${renderRawFrac(bnDisplay, denominator)} = ${renderRawFrac(anDisplay + ' ' + operation() + ' ' + bnDisplay, denominator)} = ${renderRawFrac(numerator, denominator)}`;
+
+        if (g > 1) {
+            step3Html += ` = ${renderRawFrac(numerator + '&divide;' + g, denominator + '&divide;' + g)}`;
+            if (simpD !== 1) {
+                step3Html += ` = ${renderRawFrac(simpN, simpD)}`;
+            }
+        }
+
+        if (simpD === 1) {
+            step3Html += ` = <span class="math shadow-none border-none bg-transparent p-0 text-xl font-black">${simpN}</span>`;
+        } else if (Math.abs(simpN) > simpD) {
+            step3Html += ` = ${finalMathFrac}`;
+        }
+        
+        step3Html += `</div>`;
+        steps.push(step3Html);
+      
+      }else if(state.index<6){
+        steps.push(`<strong>Langkah 1: Susun Sejajar Koma</strong><br><div class="text-center text-gray-600 text-sm mt-1">Pastikan letak tanda koma (,) sejajar lurus atas dan bawah.</div>`);
+        steps.push(`<strong>Langkah 2: Hitung Bersusun</strong>` +
+                   `<div class="mt-2 flex items-center justify-center gap-2 text-xl">` +
+                   `<span class="math shadow-none border-none bg-transparent">${decimalText(finalA.n/finalA.d)}</span> ${opSpan} <span class="math shadow-none border-none bg-transparent">${decimalText(finalB.n/finalB.d)}</span> ${eqSpan} <strong>${finalMathDec}</strong></div>`);
+      
+      }else{
+        // LOGIKA BARU UNTUK LEVEL 3: Menyesuaikan dengan format yang diminta soal!
+        const expectedFmt = getExpectedFormat();
+        
+        if (expectedFmt === 'desimal') {
+            const fraction = finalA.form==='fraction'?finalA:finalB;
+            const fracToDec = fraction.n / fraction.d;
+            
+            let fractionStep = "";
+            const w = Math.floor(fraction.n / fraction.d);
+            const r = fraction.n % fraction.d;
+            const isMixed = fraction.n > fraction.d && fraction.d !== 1;
+            
+            if (isMixed) {
+                fractionStep = `${renderMath(fraction.n, fraction.d, 'fraction')} = ${renderRawFrac(`(${w} &times; ${fraction.d}) + ${r}`, fraction.d)} = ${renderRawFrac(fraction.n, fraction.d)} = ${fraction.n} &divide; ${fraction.d} = <strong>${decimalText(fracToDec)}</strong>`;
+            } else {
+                fractionStep = `${renderMath(fraction.n, fraction.d, 'fraction')} = ${fraction.n} &divide; ${fraction.d} = <strong>${decimalText(fracToDec)}</strong>`;
+            }
+
+            steps.push(`<strong>Langkah 1: Ubah Pecahan &rarr; Desimal</strong>` +
+                       `<div class="mt-2 flex items-center justify-center gap-2 text-lg flex-wrap">` +
+                       fractionStep + `</div>`);
+                       
+            steps.push(`<strong>Langkah 2: Hitung Bersusun Sejajar Koma</strong>` +
+                       `<div class="mt-2 flex items-center justify-center gap-2 text-xl">` +
+                       `<span class="math shadow-none border-none bg-transparent">${decimalText(finalA.n/finalA.d)}</span> ${opSpan} <span class="math shadow-none border-none bg-transparent">${decimalText(finalB.n/finalB.d)}</span> ${eqSpan} <strong>${finalMathDec}</strong></div>`);
+        } else {
+            // Jika format yang diminta adalah 'pecahan'
+            const decimalItem = finalA.form==='decimal'?finalA:finalB;
+            const decVal = decimalItem.n / decimalItem.d;
+            
+            steps.push(`<strong>Langkah 1: Ubah Desimal &rarr; Pecahan</strong>` +
+                       `<div class="mt-2 flex items-center justify-center gap-2 text-lg">` +
+                       `<span class="math shadow-none border-none bg-transparent">${decimalText(decVal)}</span> = ${renderRawFrac(decimalItem.n, 100)} = ${renderMath(decimalItem.n, 100, 'fraction')}</div>`);
+            
+            const g = gcd(Math.abs(numerator), denominator);
+            const simpN = numerator / g;
+            const simpD = denominator / g;
+            
+            let step2Html = `<strong>Langkah 2: Samakan Penyebut (KPK = ${denominator}) dan Hitung</strong>` +
+                       `<div class="mt-2 flex items-center justify-center gap-2 text-lg flex-wrap">` +
+                       `${renderRawFrac(anDisplay, denominator)} ${opSpan} ${renderRawFrac(bnDisplay, denominator)} = ${renderRawFrac(anDisplay + ' ' + operation() + ' ' + bnDisplay, denominator)} = ${renderRawFrac(numerator, denominator)}`;
+            
+            if (g > 1) {
+                step2Html += ` = ${renderRawFrac(numerator + '&divide;' + g, denominator + '&divide;' + g)}`;
+                if (simpD !== 1) {
+                    step2Html += ` = ${renderRawFrac(simpN, simpD)}`;
+                }
+            }
+
+            if (simpD === 1) {
+                step2Html += ` = <span class="math shadow-none border-none bg-transparent p-0 text-xl font-black">${simpN}</span>`;
+            } else if (Math.abs(simpN) > simpD) {
+                step2Html += ` = ${finalMathFrac}`;
+            }
+            step2Html += `</div>`;
+            steps.push(step2Html);
+        }
+      }
+      
+      // LOGIKA BARU UNTUK TAMPILAN JAWABAN AKHIR
+      const formatWithUnit = (htmlMath) => {
+          return state.index >= 3 && state.index < 6 
+              ? `<span class="font-extrabold text-orange-700">Rp</span> ${htmlMath}` 
+              : `${htmlMath} <span class="text-xs font-bold text-gray-500">kg</span>`;
+      };
+      
+      const expectedFormat = getExpectedFormat();
+      const finalDisplay = expectedFormat === 'pecahan'
+          ? `${formatWithUnit(finalMathFrac)} <span class="text-gray-600 font-semibold text-sm ml-2">(Desimal: ${formatWithUnit(finalMathDec)})</span>`
+          : `${formatWithUnit(finalMathDec)} <span class="text-gray-600 font-semibold text-sm ml-2">(Pecahan: ${formatWithUnit(finalMathFrac)})</span>`;
+      
+      return { answer, n: numerator, d: denominator, steps, display: finalDisplay, finalA, finalB, mathA, mathB,
+        why: operation()==='+'?'Tepat! Menggabungkan barang = operasi penjumlahan.':'Tepat! Stok berkurang = operasi pengurangan selisih nilai.'};
+    }
+
+    function generateChoices(task) {
+      const format = getExpectedFormat();
+      let choicesList = [];
+      let uniqueVals = new Set();
+
+      if(format === 'desimal') {
+        choicesList.push({ val: task.answer, correct: true });
+        uniqueVals.add(task.answer.toFixed(4));
+
+        let offsets = [0.25, -0.25, 0.5, -0.5, 0.10, -0.10, 1.25, 0.75];
+        for(let off of offsets) {
+          let v = task.answer + off;
+          if(v >= 0 && !uniqueVals.has(v.toFixed(4))) {
+            uniqueVals.add(v.toFixed(4));
+            choicesList.push({ val: v, correct: false });
+            if(choicesList.length === 4) break;
+          }
+        }
+        
+        let counter = 1;
+        while(choicesList.length < 4) {
+           let v = task.answer + (counter * 0.15);
+           if(v >= 0 && !uniqueVals.has(v.toFixed(4))) {
+             uniqueVals.add(v.toFixed(4));
+             choicesList.push({ val: v, correct: false });
+           }
+           counter = counter > 0 ? -counter : -counter + 1;
+        }
+      } else {
+        // format === 'pecahan'
+        let g = gcd(Math.abs(task.n), task.d);
+        let simpN = task.n / g;
+        let simpD = task.d / g;
+        
+        choicesList.push({ val: task.answer, correct: true, n: simpN, d: simpD });
+        uniqueVals.add(task.answer.toFixed(4));
+        
+        // Pilihan pengecoh pecahan dihitung akurat berdasarkan penyebut aslinya
+        let fractionOffsets = [
+          {n: 1, d: simpD}, {n: -1, d: simpD}, 
+          {n: 1, d: simpD*2}, {n: -1, d: simpD*2},
+          {n: 2, d: simpD}, {n: -2, d: simpD},
+          {n: 1, d: 2}, {n: 1, d: 3}
+        ];
+        
+        for(let off of fractionOffsets) {
+           let newD = lcm(simpD, off.d);
+           let newN = simpN * (newD/simpD) + off.n * (newD/off.d);
+           if (newN < 0) continue; 
+           let newVal = newN / newD;
+           if(!uniqueVals.has(newVal.toFixed(4))) {
+             uniqueVals.add(newVal.toFixed(4));
+             let ng = gcd(Math.abs(newN), newD);
+             choicesList.push({ val: newVal, correct: false, n: newN/ng, d: newD/ng });
+             if(choicesList.length === 4) break;
+           }
+        }
+        
+        let counter = 1;
+        while(choicesList.length < 4) {
+           let newN = simpN + counter;
+           let newVal = newN / simpD;
+           if (newN >= 0 && !uniqueVals.has(newVal.toFixed(4))) {
+               uniqueVals.add(newVal.toFixed(4));
+               let ng = gcd(Math.abs(newN), simpD);
+               choicesList.push({ val: newVal, correct: false, n: newN/ng, d: simpD/ng });
+           }
+           counter = counter > 0 ? -counter : -counter + 1;
+        }
+      }
+      
+      choicesList.sort(() => Math.random() - 0.5);
+      return choicesList;
+    }
+
+    function choiceValToMath(choice) {
+      const format = getExpectedFormat();
+      if(format === 'desimal') {
+        return `<span class="math text-base sm:text-lg font-black shadow-none bg-transparent border-none">${choice.val.toFixed(2).replace('.',',')}</span>`;
+      } else {
+        return renderMath(choice.n, choice.d, 'fraction');
+      }
+    }
+    
+    function updateProgress(){
+      const done=state.records.filter(r=>r.completed).length;
+      $('score-display').textContent=state.score;
+      $('level-display').textContent=`${(state.index%3)+1}`;
+      $('progress').setAttribute('aria-valuenow',String(done));
+      $('progress-fill').style.width=(done/9*100)+'%';
+      
+      document.querySelectorAll('.category').forEach((button,i)=>{
+        const unlocked = isLevelUnlocked(i);
+        const active = Math.floor(state.index/3)===i;
+        
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+        
+        const lockSpan = button.querySelector('.lock-icon');
+        if(!unlocked) {
+           button.classList.add('locked-nav');
+           lockSpan.innerHTML = '🔒 TERKUNCI';
+           lockSpan.style.background = '#e2e8f0';
+           lockSpan.style.color = '#334155';
+           lockSpan.style.borderColor = 'transparent';
+        } else {
+           button.classList.remove('locked-nav');
+           lockSpan.innerHTML = active ? '🟢 AKTIF' : '✅ TERBUKA';
+           lockSpan.style.background = active ? '#ffffff' : '#dcfce3';
+           lockSpan.style.color = active ? '#0f766e' : '#059669';
+           lockSpan.style.borderColor = active ? '#99f6e4' : '#86efac';
+        }
+      });
+    }
+    
+    function drawShelf(){
+      const shelf=$('shelf');
+      shelf.replaceChildren();
+      pool().forEach((p,i)=>{
+        const button=document.createElement('button');
+        button.type='button';button.className='product stagger-item rounded-2xl p-3.5 sm:p-4 text-left shadow-sm flex flex-col justify-between';
+        button.style.background=colors[i%colors.length];
+        button.dataset.product=p.id;
+        button.innerHTML=`<div><span class="text-4xl sm:text-5xl block drop-shadow-sm" aria-hidden="true">${p.icon}</span><span class="block font-extrabold mt-2 text-sm sm:text-base text-gray-900">${p.name}</span></div><div class="mt-3 pt-2 border-t border-gray-300 flex items-center justify-between text-xs sm:text-sm">${display(p)}</div>`;
+        shelf.append(button);
+      });
+    }
+    
+    function drawCart(){
+      const items=selectedItems(),list=$('cart-items');
+      list.replaceChildren();
+      items.forEach((p,i)=>{
+        const li=document.createElement('li');
+        li.className='slide-in flex justify-between items-center gap-2 rounded-xl bg-white p-3 shadow-sm border border-gray-300';
+        li.innerHTML = `<span class="font-extrabold text-gray-900 flex items-center gap-1.5"><span class="bg-gray-200 rounded-full w-5 h-5 flex items-center justify-center text-[10px] text-gray-800">${i+1}</span> ${p.name}</span> <strong class="text-sm sm:text-base">${display(p)}</strong>`;
+        list.append(li);
+      });
+      
+      if(items.length > 0) {
+        $('cart-empty').hidden = true;
+      } else {
+        $('cart-empty').hidden = false;
+      }
+      
+      $('cart-status').innerHTML = items.length === 2 ? 'Penuh (2/2)' : `${items.length}/2 Barang`;
+      
+      document.querySelectorAll('.product').forEach(button=>{
+        const active=record().chosen.includes(button.dataset.product);
+        button.classList.toggle('selected',active);
+        button.setAttribute('aria-pressed',String(active));
+        button.disabled=record().completed;
+      });
+      
+      const task=problem(),r=record();
+      const expectedFormat = getExpectedFormat();
+      
+      if(task) {
+        $('question-text').innerHTML = `Barang Pilihan: <strong class="text-teal-900">${items[0].name}</strong> & <strong class="text-teal-900">${items[1].name}</strong>. <br><br>Hitunglah hasil operasi berikut:<div class="mt-3 mb-2 flex items-center gap-2 text-xl sm:text-2xl justify-center bg-white p-3 rounded-xl shadow-sm border border-teal-200">${task.mathA} <span class="math font-black px-1.5 shadow-none border-none bg-transparent">${operation()}</span> ${task.mathB}</div><div class="mt-3 bg-[#fef3c7] border border-yellow-300 text-yellow-900 p-2.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-sm"><span>💡</span> Pilih opsi persamaan dalam bentuk <span class="uppercase underline decoration-2 decoration-orange-500">${expectedFormat}</span>!</div>`;
+        
+        if(!r.choices) {
+          r.choices = generateChoices(task);
+        }
+        
+        const choicesContainer = $('choices-container');
+        choicesContainer.replaceChildren();
+        r.choices.forEach((choice, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const isSelected = r.selectedVal !== null && Math.abs(r.selectedVal - choice.val) < 1e-4;
+          btn.className = `choice-btn p-3 sm:p-3.5 rounded-xl flex items-center justify-center gap-2.5 font-extrabold text-base sm:text-lg ${isSelected ? 'selected-choice' : ''}`;
+          btn.disabled = r.completed;
+          btn.innerHTML = `<span class="bg-[#ccfbf1] text-teal-900 w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-sm border border-teal-300">${String.fromCharCode(65 + idx)}</span> ${choiceValToMath(choice)}`;
+          
+          btn.addEventListener('click', () => {
+            if(r.completed) return;
+            r.selectedVal = choice.val;
+            choicesContainer.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected-choice'));
+            btn.classList.add('selected-choice');
+            $('check-button').disabled = false;
+          });
+          
+          choicesContainer.appendChild(btn);
+        });
+        
+        $('answer-form').hidden = false;
+        $('check-button').disabled = r.selectedVal === null || r.completed;
+      } else {
+        $('question-text').innerHTML = `Silakan pilih <strong class="text-teal-800">DUA BARANG</strong> dari rak di atas terlebih dahulu. ${state.index>=6?'Pastikan memilih satu <strong class="text-blue-800">Pecahan</strong> dan satu <strong class="text-blue-800">Desimal</strong>. ':''}`;
+        $('answer-form').hidden = true;
+      }
+    }
+    
+    function showKey(task){
+      $('key-answer').innerHTML = 'Jawaban Akhir: &nbsp;' + task.display;
+      $('key-steps').innerHTML = task.steps.map((step, idx) => `<li class="bg-white/90 p-3 rounded-lg shadow-sm border border-teal-200 mb-3 leading-relaxed text-gray-900 font-semibold list-none relative"><span class="absolute -left-3 -top-3 w-7 h-7 bg-teal-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">${idx+1}</span>${step}</li>`).join('');
+      $('key-why').innerHTML = '✨ Mengapa operasi ini? &nbsp;<span class="text-gray-900 font-extrabold">' + task.why + '</span>';
+      $('key-panel').hidden = false;
+    }
+    
+    function loadMission(){
+      const r=record();
+      state.hint=0;
+      const levelNumber = Math.floor(state.index/3)+1;
+      
+      $('mission-number').classList.remove('pop');
+      void $('mission-number').offsetWidth; 
+      $('mission-number').classList.add('pop');
+      
+      $('mission-number').textContent=`LEVEL ${levelNumber} - MISI ${(state.index%3)+1}`;
+      $('mission-level').textContent=`${groups[levelNumber-1].split(': ')[1]} · ${state.index%2===0?'PENJUMLAHAN':'PENGURANGAN'}`;
+      $('question-title').textContent=state.index%2===0?'Belanja Cerdas — Gabungkan!':'Stok Berkurang — Kurangkan!';
+      
+      $('hint-display').hidden=true;
+      $('feedback').hidden=true;
+      $('key-panel').hidden=true;
+      
+      $('key-button').disabled = r.choices === null || (!r.completed && r.selectedVal === null);
+      $('hint-button').disabled=r.completed;
+      $('next-button').hidden=!r.completed;
+      
+      drawShelf();drawCart();updateProgress();
+      
+      if(r.completed){
+        $('feedback').innerHTML = r.correct?'✨ Luar biasa! Misi ini sudah dijawab benar!':'Misi ini dilewati. Jangan lupa pelajari langkah penyelesaiannya!';
+        $('feedback').className='mt-4 rounded-xl p-4 font-bold text-sm sm:text-base shadow-sm ' + (r.correct?'bg-[#dcfce3] text-green-900 border border-green-400':'bg-gray-100 text-gray-900 border border-gray-400');
+        $('feedback').hidden=false;
+        if(r.key)showKey(r.key);
+      }
+    }
+    
+    function feedback(message, styleType='error'){
+      const el=$('feedback');
+      el.innerHTML=message;
+      if(styleType==='success') {
+         el.className=`mt-4 rounded-xl p-4 font-extrabold text-sm sm:text-base shadow-sm bg-[#dcfce3] text-green-900 border border-green-500 bounce-in`;
+      } else if (styleType==='warning') {
+         el.className=`mt-4 rounded-xl p-4 font-extrabold text-sm sm:text-base shadow-sm bg-[#ffedd5] text-orange-900 border border-orange-400 slide-in`;
+      } else {
+         el.className=`mt-4 rounded-xl p-4 font-extrabold text-sm sm:text-base shadow-sm bg-[#fee2e2] text-red-900 border border-red-400 slide-in`;
+      }
+      el.hidden=false;
+    }
+    
+    $('start-form').addEventListener('submit',e=>{
+      e.preventDefault();state.player=$('player-name').value.trim();
+      if(!state.player){$('player-name').focus();return}
+      
+      if (!isMusicPlaying) {
+         bgMusic.play().then(() => {
+            isMusicPlaying = true;
+            soundToggle.textContent = '🔊';
+         }).catch(err => console.log("Autoplay dicegah", err));
+      }
+      screen('instructions');
+    });
+    
+    $('enter-game').addEventListener('click',()=>{$('player-display').textContent=state.player;loadMission();screen('game')});
+    
+    document.querySelectorAll('.category').forEach((button, i)=>{
+      button.addEventListener('click',()=>{
+        if(!isLevelUnlocked(i)) {
+           feedback('🔒 Selesaikan <strong class="text-red-800">3 Misi</strong> di level sebelumnya terlebih dahulu untuk membuka kunci level ini!', 'warning');
+           return;
+        }
+        let firstIncomplete = state.records.findIndex((r, idx) => Math.floor(idx/3) === i && !r.completed);
+        state.index = firstIncomplete >= 0 ? firstIncomplete : i * 3;
+        loadMission();
+      });
+    });
+    
+    $('shelf').addEventListener('click',e=>{
+      const button=e.target.closest('[data-product]');
+      if(!button||record().completed)return;
+      const chosen=record().chosen,id=button.dataset.product,at=chosen.indexOf(id);
+      
+      if(at>=0)chosen.splice(at,1);
+      else if(chosen.length>=2){feedback('Keranjang hanya cukup untuk dua barang. Klik barang di keranjang/rak untuk mengeluarkannya.', 'warning');return}
+      else{
+        const candidate=pool().find(p=>p.id===id);
+        if(state.index>=6&&chosen.length===1&&pool().find(p=>p.id===chosen[0]).form===candidate.form){
+          feedback('Untuk level campuran, tim kalian harus memilih satu <strong class="text-blue-900">Pecahan</strong> dan satu <strong class="text-blue-900">Desimal</strong>.', 'warning');
+          return;
+        }
+        chosen.push(id);
+      }
+      record().choices = null;
+      record().selectedVal = null;
+      record().attempts=[];
+      record().key=null;
+      $('feedback').hidden=true;$('hint-display').hidden=true;
+      drawCart();
+    });
+    
+    $('check-button').addEventListener('click', () => {
+      const task=problem(),r=record();
+      if(!task||r.completed||r.selectedVal === null) return;
+      
+      r.attempts.push(r.selectedVal);
+      r.key=task;
+      $('key-button').disabled=false;
+      
+      if(Math.abs(r.selectedVal - task.answer) < 1e-4){
+        r.completed=true;r.correct=true;state.correct++;state.score+=10;
+        $('check-button').disabled=true;$('hint-button').disabled=true;
+        document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
+        $('next-button').hidden=false;
+        
+        let msg = '✨ <strong class="text-lg">JAWABAN BENAR!</strong> Hebat, pilihan persamaan kelompok kalian TEPAT! <strong class="bg-green-200 px-2 py-0.5 rounded text-green-900 border border-green-400 shadow-sm">+10 Poin</strong>';
+        if(state.index === 2) msg += '<br><br>🎉 <strong class="text-lg">LEVEL 2 TERBUKA!</strong> Siap-siap untuk petualangan angka desimal!';
+        if(state.index === 5) msg += '<br><br>🎉 <strong class="text-lg">LEVEL 3 TERBUKA!</strong> Lanjut ke tantangan Boss terakhir!';
+        
+        feedback(msg, 'success');
+        drawCart();updateProgress();
+      } else {
+        feedback('❌ <strong class="text-lg">JAWABAN SALAH!</strong> Belum tepat, pilihan persamaan tersebut belum sesuai. Ayo diskusikan lagi dengan kelompokmu dan periksa perhitungannya!', 'error');
+      }
+    });
+    
+    $('hint-button').addEventListener('click',()=>{
+      if(!problem()){$('hint-display').innerHTML='Pilih dua barang dari rak terlebih dahulu untuk melihat petunjuk.'}
+      else{
+        const hints=state.index<3
+          ?['Ubah semua pecahan campuran menjadi pecahan biasa dulu.','Cari KPK dari kedua penyebut untuk menyamakannya.', 'Setelah penyebutnya sama, tinggal operasikan pembilangnya!']
+          :state.index<6
+          ?['Tulis kedua angka desimal ke dalam bentuk susun ke bawah.','Pastikan letak TANDA KOMA sejajar atas dan bawah.', 'Hitung seperti biasa, koma pada hasil tetap sejajar.']
+          :['Ubah format angka agar seragam terlebih dahulu (jadikan pecahan semua atau desimal semua).', 'Lakukan perhitungan sesuai materi di Level 1 atau Level 2.', 'Setelah dapat hasilnya, sesuaikan lagi dengan format jawaban yang diminta.'];
+        $('hint-display').innerHTML='<span class="text-xl block mb-1">💡</span> ' + hints[Math.min(state.hint++,hints.length-1)];
+      }
+      $('hint-display').hidden=false;
+    });
+    
+    $('key-button').addEventListener('click',()=>{
+      const r=record();
+      if(r.choices === null && !r.completed)return;
+      const task=r.key||problem();
+      if(!task)return;
+      r.key=task;
+      if(!r.completed){
+        r.completed=true;
+        $('check-button').disabled=true;$('hint-button').disabled=true;
+        document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
+        $('next-button').hidden=false;
+        drawCart();updateProgress();
+        feedback('Misi ini kalian lewati. Silakan pelajari langkah penyelesaiannya di bawah ini.', 'warning');
+      }
+      showKey(task);
+      $('key-panel').scrollIntoView({behavior:'smooth',block:'center'});
+    });
+    
+    $('next-button').addEventListener('click',()=>{
+      if(!record().completed)return;
+      
+      let nextIndex = -1;
+      for(let i=0; i<9; i++) {
+         if(!state.records[i].completed && isLevelUnlocked(Math.floor(i/3))) {
+            nextIndex = i;
+            break;
+         }
+      }
+      
+      if(nextIndex >= 0){
+        state.index = nextIndex;
+        loadMission();
+        $('game').scrollIntoView({behavior:'smooth',block:'start'});
+      } else {
+        $('result-name').textContent = 'Selamat, Tim ' + state.player + '!';
+        $('final-score').textContent = state.score + ' / 90';
+        $('correct-count').textContent = state.correct + ' / 9';
+        screen('result');
+      }
+    });
+    
+    $('restart-button').addEventListener('click',()=>{
+      generateGameItems();
+      
+      state.index=0;state.score=0;state.correct=0;state.player='';
+      state.records=Array.from({length:9},()=>({chosen:[],attempts:[],completed:false,correct:false,key:null,choices:null,selectedVal:null}));
+      $('player-name').value='';
+      screen('welcome');
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  </script>
+</body></html>
